@@ -1,0 +1,122 @@
+{
+  "1": [
+    { "item": "Oranges", "reason": "Citrus fruits are peak in winter." },
+    { "item": "Spinach", "reason": "Leafy greens are fresh this month." },
+    { "item": "Kale", "reason": "Hardy green thrives in cold weather." },
+    { "item": "Leeks", "reason": "Best flavor in winter months." },
+    { "item": "Grapefruit", "reason": "Winter citrus is at its best." },
+    { "item": "Parsnips", "reason": "Sweet and earthy after frost." },
+    { "item": "Cabbage", "reason": "Cold weather improves flavor." },
+    { "item": "Turnips", "reason": "Root vegetables are in season." }
+  ],
+  "2": [
+    { "item": "Strawberries", "reason": "Early spring berries are arriving." },
+    { "item": "Broccoli", "reason": "Great quality in late winter." },
+    { "item": "Brussels Sprouts", "reason": "Sweet after winter frosts." },
+    { "item": "Grapefruit", "reason": "Citrus at its juiciest." },
+    { "item": "Cauliflower", "reason": "Peak season for cool weather." },
+    { "item": "Celery", "reason": "Crisp and fresh in late winter." },
+    { "item": "Radicchio", "reason": "Bittersweet leaves in season." },
+    { "item": "Endive", "reason": "Best texture in cooler months." }
+  ],
+  "3": [
+    { "item": "Asparagus", "reason": "Classic spring seasonal pick." },
+    { "item": "Mushrooms", "reason": "Good availability this month." },
+    { "item": "Radishes", "reason": "Crisp and peppery in early spring." },
+    { "item": "Peas", "reason": "Fresh peas start appearing." },
+    { "item": "Spring Onions", "reason": "Tender and mild now." },
+    { "item": "Lettuce", "reason": "Leafy greens thrive in spring." },
+    { "item": "Carrots", "reason": "Sweet and crunchy in spring." },
+    { "item": "Fava Beans", "reason": "Short spring season." }
+  ],
+  "4": [
+    { "item": "Mangoes", "reason": "Mango season begins in many regions." },
+    { "item": "Cucumber", "reason": "Cooling produce for warmer days." },
+    { "item": "Artichokes", "reason": "Spring harvest is best." },
+    { "item": "Rhubarb", "reason": "Tart stalks in season." },
+    { "item": "Strawberries", "reason": "Peak flavor in spring." },
+    { "item": "Green Garlic", "reason": "Young garlic shoots available." },
+    { "item": "New Potatoes", "reason": "Tender and sweet now." },
+    { "item": "Snap Peas", "reason": "Crisp and sweet in spring." }
+  ],
+  "5": [
+    { "item": "Mangoes", "reason": "Peak mango season." },
+    { "item": "Corn", "reason": "Sweet corn is in season." },
+    { "item": "Zucchini", "reason": "Early summer squash arrives." },
+    { "item": "Apricots", "reason": "Short but sweet season." },
+    { "item": "Cherries", "reason": "Fresh and juicy in late spring." },
+    { "item": "Raspberries", "reason": "Early berries start appearing." },
+    { "item": "Fennel", "reason": "Mild and crisp in late spring." },
+    { "item": "Basil", "reason": "Herbs begin to flourish." }
+  ],
+  "6": [
+    { "item": "Watermelon", "reason": "Best for hot summer days." },
+    { "item": "Cherries", "reason": "Short and sweet cherry season." },
+    { "item": "Blueberries", "reason": "Fresh and abundant now." },
+    { "item": "Green Beans", "reason": "Tender and crisp in early summer." },
+    { "item": "Blackberries", "reason": "Ripen in early summer." },
+    { "item": "Summer Squash", "reason": "Abundant and versatile." },
+    { "item": "Tomatoes", "reason": "Early varieties start appearing." },
+    { "item": "Peaches", "reason": "First of the season available." }
+  ],
+  "7": [
+    { "item": "Peaches", "reason": "Juicy stone fruits in summer." },
+    { "item": "Tomatoes", "reason": "Vine-ripened, full flavor now." },
+    { "item": "Eggplant", "reason": "Glossy and plentiful in midsummer." },
+    { "item": "Plums", "reason": "Sweet and tart, peak season." },
+    { "item": "Nectarines", "reason": "Fragrant and juicy in summer." },
+    { "item": "Cucumbers", "reason": "Cool and crisp in hot weather." },
+    { "item": "Okra", "reason": "Best texture and flavor now." },
+    { "item": "Melons", "reason": "Cantaloupe and honeydew are ripe." }
+  ],
+  "8": [
+    { "item": "Corn", "reason": "Late summer harvests are great." },
+    { "item": "Bell Peppers", "reason": "Bright and abundant in summer." },
+    { "item": "Melons", "reason": "Cantaloupe and honeydew are ripe." },
+    { "item": "Okra", "reason": "Best texture and flavor now." },
+    { "item": "Tomatoes", "reason": "Peak flavor in late summer." },
+    { "item": "Eggplant", "reason": "Abundant and glossy now." },
+    { "item": "Peaches", "reason": "Still in season, very sweet." },
+    { "item": "Pluots", "reason": "Hybrid stone fruit in season." }
+  ],
+  "9": [
+    { "item": "Apples", "reason": "Fall apple season starts." },
+    { "item": "Pumpkin", "reason": "Autumn staples arrive." },
+    { "item": "Grapes", "reason": "Harvested at peak sweetness." },
+    { "item": "Figs", "reason": "Late summer to early fall treat." },
+    { "item": "Pears", "reason": "Begin to ripen in early fall." },
+    { "item": "Winter Squash", "reason": "First harvests of the season." },
+    { "item": "Cranberries", "reason": "Early harvest in late fall." },
+    { "item": "Sweet Potatoes", "reason": "Start coming into season." }
+  ],
+  "10": [
+    { "item": "Pear", "reason": "Sweet and in season during fall." },
+    { "item": "Sweet Potato", "reason": "Comforting fall produce." },
+    { "item": "Cranberries", "reason": "Harvested in autumn." },
+    { "item": "Turnips", "reason": "Earthy and sweet after frost." },
+    { "item": "Pumpkin", "reason": "Classic autumn flavor." },
+    { "item": "Brussels Sprouts", "reason": "Cool weather improves taste." },
+    { "item": "Persimmons", "reason": "Start to ripen in fall." },
+    { "item": "Cauliflower", "reason": "Peak season for cool weather." }
+  ],
+  "11": [
+    { "item": "Cauliflower", "reason": "Cool-season crucifer in peak." },
+    { "item": "Pomegranate", "reason": "Festive and seasonal now." },
+    { "item": "Persimmons", "reason": "Sweet and soft in late fall." },
+    { "item": "Parsnips", "reason": "Flavor deepens after cold weather." },
+    { "item": "Leeks", "reason": "Best flavor in late fall." },
+    { "item": "Cabbage", "reason": "Stores well for winter." },
+    { "item": "Apples", "reason": "Late varieties still available." },
+    { "item": "Kale", "reason": "Cold weather improves sweetness." }
+  ],
+  "12": [
+    { "item": "Oranges", "reason": "Citrus is excellent in winter." },
+    { "item": "Carrots", "reason": "Sweet and crisp this month." },
+    { "item": "Cabbage", "reason": "Stores well and is at its best." },
+    { "item": "Beets", "reason": "Earthy roots for winter dishes." },
+    { "item": "Brussels Sprouts", "reason": "Best after first frost." },
+    { "item": "Parsnips", "reason": "Sweet and earthy in winter." },
+    { "item": "Leeks", "reason": "Flavorful in cold months." },
+    { "item": "Grapefruit", "reason": "Juicy and tart in winter." }
+  ]
+}

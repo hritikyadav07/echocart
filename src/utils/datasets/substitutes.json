@@ -1,0 +1,20 @@
+{
+  "Milk": ["Almond Milk", "Soy Milk", "Oat Milk", "Lactose-free Milk"],
+  "Eggs": ["Tofu", "Chickpea Flour Batter", "Flaxseed Egg"],
+  "Butter": ["Olive Oil", "Ghee", "Margarine"],
+  "Bread": ["Whole Wheat Bread", "Multigrain Bread", "Gluten-free Bread"],
+  "Sugar": ["Honey", "Jaggery", "Stevia"],
+  "Yogurt": ["Greek Yogurt", "Coconut Yogurt"],
+  "Cheese": ["Paneer", "Vegan Cheese"],
+  "Flour": ["Whole Wheat Flour", "Almond Flour", "Oat Flour"],
+  "Rice": ["Quinoa", "Brown Rice"],
+  "Corn": ["Baby Corn", "Quinoa"],
+  "Chicken": ["Paneer", "Tofu"],
+  "Fish": ["Tofu", "Tempeh"],
+  "Mayonnaise": ["Greek Yogurt", "Hummus"],
+  "Cream": ["Coconut Cream", "Evaporated Milk"],
+  "Beef": ["Mushroom", "Lentils"],
+  "Pasta": ["Whole Wheat Pasta", "Zoodles"],
+  "Coffee": ["Decaf Coffee", "Chicory"],
+  "Tea": ["Green Tea", "Herbal Tea"]
+}

@@ -1,36 +1,61 @@
-function Item({ item, onInc, onDec, onDelete }) {
+function Item({ item, onInc, onDec, onDelete, onToggleBought }) {
   const disableDec = item.qty <= 1;
+  const isBought = Boolean(item.bought);
   return (
-    <li className="flex items-center justify-between rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm text-emerald-900 dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-100">
-      <span className="font-medium truncate px-2">{item.name}</span>
-      <div className="flex items-center gap-2">
-        <div className="inline-flex items-center ">
-          <button
-            type="button"
-            aria-label={`Decrease ${item.name}`}
-            onClick={() => onDec?.(item.id)}
-            disabled={disableDec}
-            className="px-2 py-1 text-emerald-700 font-bold leading-none disabled:opacity-40 disabled:cursor-not-allowed dark:text-emerald-300"
-          >
-            −
-          </button>
-          <span className="min-w-8 text-center px-1 text-gray-800 dark:text-slate-100">
-            {item.qty}
-          </span>
-          <button
-            type="button"
-            aria-label={`Increase ${item.name}`}
-            onClick={() => onInc?.(item.id)}
-            className="px-1 py-1 text-emerald-700 font-bold leading-none dark:text-emerald-300"
-          >
-            +
-          </button>
-        </div>
+    <li
+      className={`group flex items-center justify-between rounded-xl border border-emerald-100 bg-white px-2.5 py-2.5 shadow-sm transition hover:shadow-md dark:border-slate-700 dark:bg-slate-800 ${
+        isBought ? "opacity-70" : ""
+      }`}
+    >
+      {/* Left: checkbox + name */}
+      <label className="flex min-w-0 items-center gap-3 cursor-pointer">
+        <input
+          type="checkbox"
+          aria-label={`Mark ${item.name} as bought`}
+          checked={isBought}
+          onChange={() => onToggleBought?.(item.id)}
+          className="h-5 w-5 accent-emerald-600 rounded border border-emerald-300 dark:border-slate-600"
+        />
+        <span
+          className={`truncate font-medium ${
+            isBought
+              ? "text-gray-500 line-through dark:text-slate-400"
+              : "text-emerald-900 dark:text-slate-100"
+          }`}
+        >
+          {item.name}
+        </span>
+      </label>
+
+      {/* Right: quantity stepper + delete */}
+      <div className="flex items-center gap-1 sm:gap-2">
+        <button
+          type="button"
+          aria-label={`Decrease ${item.name}`}
+          onClick={() => onDec?.(item.id)}
+          disabled={disableDec}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 text-emerald-700 hover:bg-emerald-50 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-600 dark:text-emerald-300 dark:hover:bg-slate-700"
+          title="Decrease"
+        >
+          −
+        </button>
+        <span className="mx-1 w-8 text-center font-semibold tabular-nums text-emerald-900 dark:text-slate-100">
+          {item.qty}
+        </span>
+        <button
+          type="button"
+          aria-label={`Increase ${item.name}`}
+          onClick={() => onInc?.(item.id)}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 text-emerald-700 hover:bg-emerald-50 active:scale-95 dark:border-slate-600 dark:text-emerald-300 dark:hover:bg-slate-700"
+          title="Increase"
+        >
+          +
+        </button>
         <button
           type="button"
           aria-label={`Remove ${item.name}`}
           onClick={() => onDelete?.(item.id)}
-          className="inline-flex items-center rounded-md px-1 text-red-600 hover:bg-red-100 "
+          className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-red-600 hover:bg-red-50 active:scale-95 dark:hover:bg-slate-700"
           title="Delete item"
         >
           <svg
