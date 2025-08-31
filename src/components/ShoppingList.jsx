@@ -20,7 +20,7 @@ function groupByCategory(items) {
 function ShoppingList({ items = [], onInc, onDec, onDelete, onToggleBought }) {
   const groups = groupByCategory(items);
   return (
-  <div className="rounded-xl border border-emerald-100 bg-white p-2 sm:p-3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-8rem)] lg:overflow-auto dark:bg-slate-800 dark:border-slate-700">
+    <div className="rounded-xl border border-emerald-100 bg-white p-2 sm:p-3 lg:sticky lg:top-20 lg:max-h-[calc(100vh-8rem)] lg:overflow-auto dark:bg-slate-800 dark:border-slate-700">
       <h2 className="mb-2 text-base sm:text-lg font-medium text-emerald-800 dark:text-emerald-300">
         Shopping list
       </h2>

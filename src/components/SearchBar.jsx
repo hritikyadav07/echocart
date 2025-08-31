@@ -16,7 +16,10 @@ function SearchBar({ value, onChange, onSubmit }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-1.5 sm:gap-2">
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center gap-1.5 sm:gap-2"
+    >
       {/* beginner: extra wrapper div that isn't needed */}
       <div className="relative flex-1" style={{ minHeight: 0 }}>
         <span

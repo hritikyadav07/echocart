@@ -150,7 +150,7 @@ function SearchPaneImpl({ onAddToList, speakOut, onStatus }, ref) {
         </div>
       )}
 
-  <div className="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      <div className="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {searchResults.map((p) => (
           <ProductCard
             key={p.id}

@@ -79,7 +79,7 @@ function App() {
     { code: "en-US", label: "English" },
     { code: "hi-IN", label: "Hindi" },
     { code: "es-ES", label: "Spanish" },
-  { code: "ja-JP", label: "Japanese" },
+    { code: "ja-JP", label: "Japanese" },
   ];
 
   const handleMicClick = () => {
@@ -482,7 +482,7 @@ function App() {
         setShowFbPanel={setShowFbPanel}
         onRunFirestoreCheck={runFirestoreCheck}
         isDark={isDark}
-  onToggleTheme={toggleTheme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Main */}
