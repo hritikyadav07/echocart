@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { collection, getDocs, limit, query } from "firebase/firestore";
 import { signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "./utils/firebaseConfig.js";
 import {
@@ -24,7 +23,7 @@ import { recordEvent } from "./utils/history.js";
 import useSpeechRecognition from "./hooks/useSpeechRecognition";
 import useSpeechSynthesis from "./hooks/useSpeechSynthesis";
 import { isPlausibleItemName, toTitleCase as tc } from "./utils/validation.js";
-import { parseWithGemini } from "./utils/parseWithGemini.js";
+// Lazy-load parser (and firebase/ai) only when needed to keep initial bundle small
 import { parseFallback } from "./utils/fallbackParser.js";
 // search is now encapsulated in SearchPane
 import {
@@ -35,6 +34,8 @@ import {
   toggleItemBought,
 } from "./utils/itemUtils.js";
 import SearchPane from "./components/SearchPane.jsx";
+import MicAccessBanner from "./components/MicAccessBanner.jsx";
+import { checkMicPermission, requestMicAccess } from "./utils/permissions.js";
 
 function App() {
   const searchPaneRef = useRef(null);
@@ -62,6 +63,8 @@ function App() {
   const [showFbPanel, setShowFbPanel] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [smartSuggestions, setSmartSuggestions] = useState([]);
+  const [micPermission, setMicPermission] = useState("unknown"); // 'granted' | 'denied' | 'prompt' | 'unknown' | 'unavailable'
+  const [showMicBanner, setShowMicBanner] = useState(false);
   // Search state moved to SearchPane component
   // Keep latest items in a ref to avoid useEffect dependency loops
   const itemsRef = useRef([]);
@@ -82,12 +85,28 @@ function App() {
       pushToast("Speech not supported in this browser", "error");
       return;
     }
-    // Start real listening
-    const started = startListening();
-    if (started) {
-      setIsListening(true);
-      setStatus("Listening…");
-    }
+    // First ensure mic permission via getUserMedia (required on many mobiles)
+    const askAndStart = async () => {
+      try {
+        if (micPermission !== "granted") {
+          await requestMicAccess();
+          setMicPermission("granted");
+        }
+      } catch (e) {
+        const msg = e?.message || "Microphone permission denied";
+        setStatus(msg);
+        pushToast(msg, "error");
+        setMicPermission("denied");
+        setShowMicBanner(true);
+        return;
+      }
+      const started = startListening();
+      if (started) {
+        setIsListening(true);
+        setStatus("Listening…");
+      }
+    };
+    askAndStart();
   };
 
   // After mic stops (listening false), process the last transcript once
@@ -103,6 +122,8 @@ function App() {
     const run = async () => {
       try {
         setStatus("Parsing…");
+        // Dynamic import so firebase/ai is code-split
+        const { parseWithGemini } = await import("./utils/parseWithGemini.js");
         const parsed = await parseWithGemini(cleaned, lang);
         if (cancelled) return;
 
@@ -251,8 +272,13 @@ function App() {
         if (!user) {
           await signInAnonymously(auth);
         }
-        const q = query(collection(db, "healthcheck"), limit(1));
-        await getDocs(q);
+        if (db) {
+          const { collection, getDocs, limit, query } = await import(
+            "firebase/firestore"
+          );
+          const q = query(collection(db, "healthcheck"), limit(1));
+          await getDocs(q);
+        }
         setFbOk(true);
         // Optionally hydrate from Firestore if local is empty or very small
         try {
@@ -284,6 +310,23 @@ function App() {
     const dark = stored ? stored === "dark" : prefersDark;
     setIsDark(dark);
     document.documentElement.classList.toggle("dark", dark);
+  }, []);
+
+  // Check mic permission on mount to show proactive banner on mobile
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const state = await checkMicPermission();
+      if (cancelled) return;
+      setMicPermission(state);
+      // Show banner if we are likely to prompt or have been denied
+      setShowMicBanner(
+        state === "prompt" || state === "denied" || state === "unknown"
+      );
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const toggleTheme = () => {
@@ -358,6 +401,9 @@ function App() {
       if (!auth.currentUser) {
         await signInAnonymously(auth);
       }
+      const { collection, getDocs, limit, query } = await import(
+        "firebase/firestore"
+      );
       const q = query(collection(db, "healthcheck"), limit(1));
       await getDocs(q);
       setStatus("Firestore connected ");
@@ -385,6 +431,22 @@ function App() {
 
       {/* Main */}
       <main className="mx-auto max-w-3xl px-4 py-8 pb-28">
+        <MicAccessBanner
+          visible={showMicBanner}
+          onEnable={async () => {
+            try {
+              await requestMicAccess();
+              setMicPermission("granted");
+              setShowMicBanner(false);
+              pushToast("Microphone enabled", "success");
+            } catch (e) {
+              const msg = e?.message || "Microphone permission denied";
+              setMicPermission("denied");
+              pushToast(msg, "error");
+            }
+          }}
+          onDismiss={() => setShowMicBanner(false)}
+        />
         <div className="flex flex-col items-center gap-6">
           {/* Product search */}
           <SearchPane

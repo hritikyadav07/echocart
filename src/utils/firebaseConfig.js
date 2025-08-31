@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
+import { getFirestore } from "firebase/firestore";
 
 // Vite only exposes env vars that start with VITE_
 const firebaseConfig = {
@@ -19,7 +20,7 @@ if (!firebaseConfig.apiKey) {
 }
 
 const app = initializeApp(firebaseConfig);
-export const db = null; // Disable Firestore for now, to avoid cold start issues on free tier
+export const db = getFirestore(app);
 export const auth = getAuth(app);
 
 // Initialize the Gemini Developer API backend service
