@@ -10,7 +10,10 @@ import { getAllAggregates, getAggregate, recordEvent } from "./history.js";
 // ]
 
 export function generateSuggestions({ currentItems = [], now = new Date() }) {
-  const suggestions = [];
+  const CAP = 4;
+  const historyCandidates = [];
+  const seasonalCandidates = [];
+  const subsCandidates = [];
   const currentNames = new Set(
     (currentItems || []).map((i) => i.name.toLowerCase())
   );
@@ -36,7 +39,7 @@ export function generateSuggestions({ currentItems = [], now = new Date() }) {
         } ago.`,
         "history"
       );
-      suggestions.push({ item: a.name, reason, type: "history", score });
+      historyCandidates.push({ item: a.name, reason, type: "history", score });
     }
   }
 
@@ -56,7 +59,7 @@ export function generateSuggestions({ currentItems = [], now = new Date() }) {
       s.reason || `${name} is in season this month.`,
       "seasonal"
     );
-    suggestions.push({ item: name, reason, type: "seasonal", score });
+    seasonalCandidates.push({ item: name, reason, type: "seasonal", score });
   }
 
   // 3) Substitutes: for items removed recently or dietary alternatives
@@ -75,22 +78,49 @@ export function generateSuggestions({ currentItems = [], now = new Date() }) {
         `Alternative to ${i.name.toLowerCase()}.`,
         "substitute"
       );
-      suggestions.push({ item: alt, reason, type: "substitute", score });
+      subsCandidates.push({ item: alt, reason, type: "substitute", score });
     }
   }
 
-  // Deduplicate by item (keep highest score)
-  const bestByItem = new Map();
-  for (const s of suggestions) {
+  // Rank within each bucket
+  historyCandidates.sort((a, b) => b.score - a.score);
+  seasonalCandidates.sort((a, b) => b.score - a.score);
+  subsCandidates.sort((a, b) => b.score - a.score);
+
+  // Pick a balanced set: up to 2 from history, up to 2 from seasonal
+  const picks = [];
+  const seen = new Set();
+  const pushPick = (s) => {
     const key = s.item.toLowerCase();
-    const prev = bestByItem.get(key);
-    if (!prev || s.score > prev.score) bestByItem.set(key, s);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    picks.push(s);
+    return true;
+  };
+
+  for (let i = 0; i < historyCandidates.length && picks.length < 2; i++) {
+    pushPick(historyCandidates[i]);
+  }
+  for (let i = 0; i < seasonalCandidates.length && picks.length < 4; i++) {
+    // allow up to 2 seasonal in first pass
+    if (picks.filter((p) => p.type === "seasonal").length >= 2) break;
+    pushPick(seasonalCandidates[i]);
   }
 
-  // Final sort by score desc and cap to top N
-  return Array.from(bestByItem.values())
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 8);
+  // If still not enough, fill from remaining highest scored across all
+  if (picks.length < CAP) {
+    const pool = [
+      ...historyCandidates,
+      ...seasonalCandidates,
+      ...subsCandidates,
+    ].sort((a, b) => b.score - a.score);
+    for (const s of pool) {
+      if (picks.length >= CAP) break;
+      pushPick(s);
+    }
+  }
+
+  return picks.slice(0, CAP);
 }
 
 export function suggestSubstitutesFor(itemName, currentItems = []) {

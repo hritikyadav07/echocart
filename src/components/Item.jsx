@@ -1,9 +1,11 @@
 function Item({ item, onInc, onDec, onDelete, onToggleBought }) {
-  const disableDec = item.qty <= 1;
-  const isBought = Boolean(item.bought);
+  // beginner: using var and inline logs
+  var disableDec = item.qty <= 1;
+  var isBought = Boolean(item.bought);
+  console.log("render item:", item && item.name);
   return (
     <li
-      className={`group flex items-center justify-between rounded-xl border border-emerald-100 bg-white px-2.5 py-2.5 shadow-sm transition hover:shadow-md dark:border-slate-700 dark:bg-slate-800 ${
+      className={`group flex items-center justify-between rounded-xl border border-emerald-100 bg-white px-3 py-2.5 shadow-sm transition hover:shadow-md dark:border-slate-700 dark:bg-slate-800 ${
         isBought ? "opacity-70" : ""
       }`}
     >
@@ -15,6 +17,7 @@ function Item({ item, onInc, onDec, onDelete, onToggleBought }) {
           checked={isBought}
           onChange={() => onToggleBought?.(item.id)}
           className="h-5 w-5 accent-emerald-600 rounded border border-emerald-300 dark:border-slate-600"
+          style={{ cursor: "pointer" }}
         />
         <span
           className={`truncate font-medium ${
@@ -28,25 +31,25 @@ function Item({ item, onInc, onDec, onDelete, onToggleBought }) {
       </label>
 
       {/* Right: quantity stepper + delete */}
-      <div className="flex items-center gap-1 sm:gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2">
         <button
           type="button"
           aria-label={`Decrease ${item.name}`}
           onClick={() => onDec?.(item.id)}
           disabled={disableDec}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 text-emerald-700 hover:bg-emerald-50 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-600 dark:text-emerald-300 dark:hover:bg-slate-700"
+          className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-emerald-200 text-emerald-700 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-600 dark:text-emerald-300 dark:hover:bg-slate-700"
           title="Decrease"
         >
           −
         </button>
-        <span className="mx-1 w-8 text-center font-semibold tabular-nums text-emerald-900 dark:text-slate-100">
+        <span className="mx-1 w-7 sm:w-8 text-center font-semibold tabular-nums text-emerald-900 dark:text-slate-100">
           {item.qty}
         </span>
         <button
           type="button"
           aria-label={`Increase ${item.name}`}
           onClick={() => onInc?.(item.id)}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 text-emerald-700 hover:bg-emerald-50 active:scale-95 dark:border-slate-600 dark:text-emerald-300 dark:hover:bg-slate-700"
+          className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border border-emerald-200 text-emerald-700 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 active:scale-95 dark:border-slate-600 dark:text-emerald-300 dark:hover:bg-slate-700"
           title="Increase"
         >
           +
@@ -55,7 +58,7 @@ function Item({ item, onInc, onDec, onDelete, onToggleBought }) {
           type="button"
           aria-label={`Remove ${item.name}`}
           onClick={() => onDelete?.(item.id)}
-          className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-red-600 hover:bg-red-50 active:scale-95 dark:hover:bg-slate-700"
+          className="ml-1 inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 active:scale-95 dark:hover:bg-slate-700"
           title="Delete item"
         >
           <svg

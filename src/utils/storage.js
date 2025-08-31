@@ -14,6 +14,7 @@ import {
 import { db, auth } from "./firebaseConfig.js";
 
 const LS_KEY = "echocart:list";
+const LS_ARCHIVES = "echocart:archives:v1";
 const COLLECTION = "shoppingHistory"; // exact name as requested
 
 // LocalStorage helpers
@@ -35,6 +36,44 @@ export function saveListToLocal(items) {
   } catch {
     // ignore quota errors
   }
+}
+
+// Local archives helpers
+export function loadArchivesFromLocal() {
+  try {
+    const raw = localStorage.getItem(LS_ARCHIVES);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveArchivesToLocal(archives) {
+  try {
+    localStorage.setItem(LS_ARCHIVES, JSON.stringify(archives || []));
+  } catch {
+    // ignore quota errors
+  }
+}
+
+export function addArchiveToLocal({ items = [], meta = {} } = {}) {
+  const archives = loadArchivesFromLocal();
+  const entry = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    archivedAt: new Date().toISOString(),
+    items: (items || []).map((it) => ({
+      id: it.id,
+      name: it.name,
+      qty: it.qty,
+      bought: !!it.bought,
+    })),
+    ...meta,
+  };
+  archives.unshift(entry);
+  saveArchivesToLocal(archives);
+  return entry;
 }
 
 // Firestore helpers
@@ -112,6 +151,9 @@ export async function saveCurrentListDoc(items) {
 export default {
   loadListFromLocal,
   saveListToLocal,
+  loadArchivesFromLocal,
+  saveArchivesToLocal,
+  addArchiveToLocal,
   saveListToFirestore,
   loadLatestListFromFirestore,
   saveCurrentListDoc,

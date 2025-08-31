@@ -7,6 +7,7 @@ import {
   saveListToFirestore,
   loadLatestListFromFirestore,
   saveCurrentListDoc,
+  addArchiveToLocal,
 } from "./utils/storage.js";
 import Navbar from "./components/Navbar.jsx";
 import ShoppingList from "./components/ShoppingList.jsx";
@@ -36,6 +37,7 @@ import {
 import SearchPane from "./components/SearchPane.jsx";
 import MicAccessBanner from "./components/MicAccessBanner.jsx";
 import { checkMicPermission, requestMicAccess } from "./utils/permissions.js";
+import { aiSuggest } from "./utils/aiSuggestions.js";
 
 function App() {
   const searchPaneRef = useRef(null);
@@ -77,9 +79,11 @@ function App() {
     { code: "en-US", label: "English" },
     { code: "hi-IN", label: "Hindi" },
     { code: "es-ES", label: "Spanish" },
+  { code: "ja-JP", label: "Japanese" },
   ];
 
   const handleMicClick = () => {
+    console.log("mic clicked");
     if (!supported) {
       setStatus("Speech not supported in this browser");
       pushToast("Speech not supported in this browser", "error");
@@ -220,8 +224,16 @@ function App() {
           // voice query intents for suggestions
           const lower = (item || "").toLowerCase();
           if (/what do you suggest|suggest.*today|recommend/.test(lower)) {
-            const s = generateSuggestions({ currentItems: itemsRef.current });
-            setSmartSuggestions(s);
+            let s = [];
+            try {
+              s = await aiSuggest({ currentItems: itemsRef.current });
+            } catch (e) {
+              console.warn("AI suggestions failed in voice flow", e?.message);
+            }
+            if (!s || !s.length) {
+              s = generateSuggestions({ currentItems: itemsRef.current });
+            }
+            setSmartSuggestions((s || []).slice(0, 4));
             setStatus("Here are some suggestions for today.");
             pushToast("Suggestions updated", "info");
             // Clear search UI when moving to suggestions view
@@ -338,6 +350,34 @@ function App() {
     });
   };
 
+  // New List: archive current and clear
+  const startNewList = async () => {
+    try {
+      // archive locally
+      const archived = addArchiveToLocal({
+        items,
+        meta: { reason: "archive" },
+      });
+      // archive in Firestore as a snapshot with reason
+      try {
+        await saveListToFirestore(items, {
+          reason: "archive",
+          archivedId: archived.id,
+        });
+      } catch (e) {
+        console.warn("Cloud archive failed", e?.message);
+      }
+      // clear UI list
+      setItems([]);
+      saveListToLocal([]);
+      await saveCurrentListDoc([]);
+      setStatus("Started a new list.");
+      pushToast("New list created", "info");
+    } catch {
+      pushToast("Could not start a new list", "error");
+    }
+  };
+
   // List handlers
   const addItem = (name) => {
     setItems((prev) => addItemToList(prev, name, 1));
@@ -367,8 +407,21 @@ function App() {
   useEffect(() => {
     saveListToLocal(items);
     itemsRef.current = items; // keep latest snapshot for voice logic
-    // update suggestions whenever items or history changes (lightweight)
-    setSmartSuggestions(generateSuggestions({ currentItems: items }));
+    // update suggestions: try AI first, then heuristic fallback
+    (async () => {
+      try {
+        const ai = await aiSuggest({ currentItems: items });
+        if (Array.isArray(ai) && ai.length) {
+          setSmartSuggestions(ai.slice(0, 4));
+          return;
+        }
+      } catch (e) {
+        console.warn("AI suggestions failed, using local engine", e?.message);
+      }
+      setSmartSuggestions(
+        generateSuggestions({ currentItems: items }).slice(0, 4)
+      );
+    })();
     // Firestore: write a history snapshot and also maintain a current doc (best-effort)
     const doCloud = async () => {
       try {
@@ -416,7 +469,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white text-gray-900 dark:from-slate-900 dark:to-slate-950 dark:text-slate-100">
+    <div
+      className="min-h-screen bg-gradient-to-b from-emerald-50 to-white text-gray-900 dark:from-slate-900 dark:to-slate-950 dark:text-slate-100"
+      style={{ width: "100%" }}
+    >
       <Navbar
         lang={lang}
         onLangChange={setLang}
@@ -426,11 +482,11 @@ function App() {
         setShowFbPanel={setShowFbPanel}
         onRunFirestoreCheck={runFirestoreCheck}
         isDark={isDark}
-        onToggleTheme={toggleTheme}
+  onToggleTheme={toggleTheme}
       />
 
       {/* Main */}
-      <main className="mx-auto max-w-3xl px-4 py-8 pb-28">
+      <main className="mx-auto max-w-6xl px-4 py-8 pb-28">
         <MicAccessBanner
           visible={showMicBanner}
           onEnable={async () => {
@@ -447,38 +503,84 @@ function App() {
           }}
           onDismiss={() => setShowMicBanner(false)}
         />
-        <div className="flex flex-col items-center gap-6">
-          {/* Product search */}
-          <SearchPane
-            ref={searchPaneRef}
-            onAddToList={(prod) => {
-              const pretty = `${prod.brand} ${prod.name} ${prod.size}`.trim();
-              setItems((prev) => addItemToList(prev, pretty, 1));
-              setStatus(`Added: ${pretty}`);
-              pushToast(`Added ${pretty}`, "success");
-              speakOut(`Added ${prod.name}`);
-            }}
-            speakOut={speakOut}
-            onStatus={(msg) => setStatus(msg)}
-          />
-          {/* Voice HUD + status */}
-          <div className="w-full space-y-2">
-            <VoiceHud
-              listening={listening || isListening}
-              interim={interim}
-              finalText={transcript}
-              intent={lastIntent}
-              lang={lang}
+        {/* beginner: unnecessary wrapper */}
+        <div
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start"
+          id="main-grid"
+        >
+          {/* Left: Search + Voice + (Mobile List first) + Suggestions */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Product search */}
+            <SearchPane
+              ref={searchPaneRef}
+              onAddToList={(prod) => {
+                const pretty = `${prod.brand} ${prod.name} ${prod.size}`.trim();
+                setItems((prev) => addItemToList(prev, pretty, 1));
+                setStatus(`Added: ${pretty}`);
+                pushToast(`Added ${pretty}`, "success");
+                speakOut(`Added ${prod.name}`);
+              }}
+              speakOut={speakOut}
+              onStatus={(msg) => setStatus(msg)}
             />
-            <div className="rounded-xl p-3 border border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-800">
-              <p className="text-sm text-gray-800 dark:text-slate-200">
-                {status ? status : "Status: Idle"}
-              </p>
+
+            {/* Voice HUD + status */}
+            <div className="space-y-2">
+              <VoiceHud
+                listening={listening || isListening}
+                interim={interim}
+                finalText={transcript}
+                intent={lastIntent}
+                lang={lang}
+              />
+              <div className="rounded-xl p-3 border border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+                <p className="text-sm text-gray-800 dark:text-slate-200">
+                  {status ? status : "Status: Idle"}
+                </p>
+              </div>
             </div>
+
+            {/* Mobile: Shopping list appears here (before suggestions) */}
+            <div className="lg:hidden">
+              <ShoppingList
+                items={items}
+                onInc={incQty}
+                onDec={decQty}
+                onDelete={(id) => {
+                  const victim = items.find((i) => i.id === id);
+                  setItems((prev) => deleteItemById(prev, id));
+                  if (victim) {
+                    recordEvent("remove", victim.name, victim.qty || 1);
+                    const subs = suggestSubstitutesFor(victim.name, items);
+                    if (subs.length) {
+                      setSmartSuggestions((cur) => mergeSuggestions(cur, subs));
+                    }
+                  }
+                }}
+                onToggleBought={toggleBought}
+              />
+            </div>
+
+            {/* Suggestions */}
+            <Suggestions
+              suggestions={smartSuggestions.slice(0, 4)}
+              onAdd={(name) => {
+                addItem(name);
+                acceptSuggestion(name);
+                setStatus(`Added: ${name}`);
+                pushToast(`Added ${name}`, "success");
+              }}
+              onDismiss={(name) => {
+                rejectSuggestion(name);
+                setSmartSuggestions((cur) =>
+                  cur.filter((s) => (s.item || s) !== name)
+                );
+              }}
+            />
           </div>
 
-          {/* Shopping list area */}
-          <div className="w-full">
+          {/* Right: Shopping list (desktop only) */}
+          <div className="lg:col-span-1 hidden lg:block">
             <ShoppingList
               items={items}
               onInc={incQty}
@@ -498,35 +600,28 @@ function App() {
               onToggleBought={toggleBought}
             />
           </div>
-
-          {/* Suggestions */}
-          <div className="w-full">
-            <Suggestions
-              suggestions={smartSuggestions}
-              onAdd={(name) => {
-                addItem(name);
-                acceptSuggestion(name);
-                setStatus(`Added: ${name}`);
-                pushToast(`Added ${name}`, "success");
-              }}
-              onDismiss={(name) => {
-                rejectSuggestion(name);
-                setSmartSuggestions((cur) =>
-                  cur.filter((s) => (s.item || s) !== name)
-                );
-              }}
-            />
-          </div>
         </div>
       </main>
 
-      {/* Floating Mic Button at bottom center */}
+      {/* Floating Mic Button (bottom-right) */}
+      {/* Floating New List Button (bottom-left) */}
+      <button
+        type="button"
+        onClick={startNewList}
+        aria-label="Start a new list"
+        className="fixed bottom-6 left-6 z-50 inline-flex items-center justify-center rounded-full border bg-gradient-to-br from-emerald-50 to-white shadow-lg transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:from-slate-800 dark:to-slate-900 dark:border-slate-600 border-emerald-200 text-emerald-800 hover:shadow-emerald-200 hover:shadow-xl dark:text-slate-100 px-4 py-2 text-sm sm:text-base"
+        title="Start a new list"
+      >
+        New List
+      </button>
+
+      {/* Floating Mic Button (bottom-right) */}
       <button
         type="button"
         onClick={handleMicClick}
         aria-pressed={listening || isListening}
         aria-label="Start voice input"
-        className={`fixed bottom-12 left-1/2 -translate-x-1/2 z-50 inline-flex h-16 w-16 items-center justify-center rounded-full border bg-gradient-to-br from-emerald-50 to-white shadow-lg transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:from-slate-800 dark:to-slate-900 dark:border-slate-600 ${
+        className={`fixed bottom-6 right-6 z-50 inline-flex h-16 w-16 items-center justify-center rounded-full border bg-gradient-to-br from-emerald-50 to-white shadow-lg transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:from-slate-800 dark:to-slate-900 dark:border-slate-600 ${
           listening || isListening
             ? "border-emerald-600 text-emerald-700 dark:text-emerald-300 animate-pulse"
             : "border-emerald-200 text-emerald-800 hover:shadow-emerald-200 hover:shadow-xl dark:text-slate-100"

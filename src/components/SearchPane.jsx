@@ -66,8 +66,8 @@ function SearchPaneImpl({ onAddToList, speakOut, onStatus }, ref) {
   };
 
   return (
-    <div className="w-full rounded-xl border border-emerald-100 bg-white p-3 dark:bg-slate-800 dark:border-slate-700">
-      <h2 className="mb-3 text-base sm:text-lg font-medium text-emerald-800 dark:text-emerald-300">
+    <div className="w-full rounded-xl border border-emerald-100 bg-white p-3 sm:p-4 dark:bg-slate-800 dark:border-slate-700">
+      <h2 className="mb-2 sm:mb-3 text-base sm:text-lg font-semibold tracking-tight text-emerald-800 dark:text-emerald-300">
         Search products
       </h2>
 
@@ -80,7 +80,7 @@ function SearchPaneImpl({ onAddToList, speakOut, onStatus }, ref) {
       {Boolean(lastQuery || Object.keys(activeFilters || {}).length) && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {lastQuery && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-slate-700/40 dark:text-slate-200">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200 dark:bg-slate-700/40 dark:text-slate-200 dark:ring-slate-600">
               Query: {lastQuery}
             </span>
           )}
@@ -91,7 +91,7 @@ function SearchPaneImpl({ onAddToList, speakOut, onStatus }, ref) {
                 const f = { ...activeFilters, brand: null };
                 requery(f);
               }}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-200 dark:bg-slate-700/60 dark:text-slate-100"
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-200 ring-1 ring-inset ring-emerald-200 dark:bg-slate-700/60 dark:text-slate-100 dark:ring-slate-600"
               title="Remove brand filter"
             >
               Brand: {activeFilters.brand} ×
@@ -104,7 +104,7 @@ function SearchPaneImpl({ onAddToList, speakOut, onStatus }, ref) {
                 const f = { ...activeFilters, size: null };
                 requery(f);
               }}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-200 dark:bg-slate-700/60 dark:text-slate-100"
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-200 ring-1 ring-inset ring-emerald-200 dark:bg-slate-700/60 dark:text-slate-100 dark:ring-slate-600"
               title="Remove size filter"
             >
               Size: {activeFilters.size} ×
@@ -117,7 +117,7 @@ function SearchPaneImpl({ onAddToList, speakOut, onStatus }, ref) {
                 const f = { ...activeFilters, isOrganic: false };
                 requery(f);
               }}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-200 dark:bg-slate-700/60 dark:text-slate-100"
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-200 ring-1 ring-inset ring-emerald-200 dark:bg-slate-700/60 dark:text-slate-100 dark:ring-slate-600"
               title="Remove organic filter"
             >
               Organic ×
@@ -131,7 +131,7 @@ function SearchPaneImpl({ onAddToList, speakOut, onStatus }, ref) {
                 const f = { ...activeFilters, minPrice: null, maxPrice: null };
                 requery(f);
               }}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-200 dark:bg-slate-700/60 dark:text-slate-100"
+              className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-200 ring-1 ring-inset ring-emerald-200 dark:bg-slate-700/60 dark:text-slate-100 dark:ring-slate-600"
               title="Remove price filter"
             >
               Price{" "}
@@ -150,7 +150,7 @@ function SearchPaneImpl({ onAddToList, speakOut, onStatus }, ref) {
         </div>
       )}
 
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+  <div className="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {searchResults.map((p) => (
           <ProductCard
             key={p.id}
